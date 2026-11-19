@@ -1,0 +1,16 @@
+ATR-102 MASTERING TAPE RECORDER PRO
+Copyright (c) 2026 Diamont Vault(R). All rights reserved.
+
+Software propietario. Ninguna parte de este codigo, de los graficos incluidos en /assets
+ni del binario resultante puede copiarse, modificarse o distribuirse sin autorizacion
+escrita de Diamont Vault(R).
+
+Componentes de terceros:
+  - JUCE 8 (https://juce.com) se distribuye bajo licencia dual AGPLv3 / comercial. Para
+    distribuir este plugin como software cerrado se necesita una licencia comercial de JUCE
+    (o publicar el codigo bajo AGPLv3). Revisa los terminos vigentes antes de publicar.
+  - VST3 SDK (Steinberg), incluido via JUCE, bajo sus propios terminos.
+
+"Ampex" y "ATR-102" son marcas de sus respectivos titulares. Este proyecto no esta
+afiliado ni avalado por Ampex ni por Universal Audio. Consulta asesoria legal antes de
+comercializar con esos nombres.

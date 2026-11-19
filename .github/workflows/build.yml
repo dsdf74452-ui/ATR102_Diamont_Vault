@@ -1,0 +1,40 @@
+name: Build VST3 (Windows)
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dsp-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar y ejecutar test del motor
+        run: |
+          g++ -O2 -std=c++17 -ISource tools/test_engine.cpp Source/TapeEngine.cpp -o test_engine
+          ./test_engine | tee dsp_report.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsp-report
+          path: dsp_report.txt
+
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, Win32]
+    runs-on: windows-latest
+    # Win32 (32 bits) es experimental: si JUCE/VST3 no compila para esa arquitectura no bloquea el resto.
+    continue-on-error: ${{ matrix.arch == 'Win32' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A ${{ matrix.arch }}
+      - name: Compilar
+        run: cmake --build build --config Release --parallel
+      - name: Subir VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: ATR102-VST3-${{ matrix.arch }}
+          path: build/ATR102_artefacts/Release/VST3/
