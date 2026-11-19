@@ -9,7 +9,7 @@
 | 5 | Verificar el sentido de giro | **Razonable.** No lo he verificado contra fotos de una ATR-102 real. | `kPlayDirection` en `PluginEditor.cpp`; comprueba con tu referencia. |
 | 6 | El ruido es blanco | **Parcial.** Se inyecta antes del de-enfasis (−9 dB en altas) y del filtro de perdida de HF, asi que a la salida no es blanco. Aun asi no esta calibrado ni tiene componente 1/f ni ruido de modulacion. | Pendiente de medir. |
 | 7 | Las cifras no tienen metodo | **Cierto.** | Metodo abajo; las medidas son SIN ponderar. |
-| – | "Diamont Vault®" | Lo pediste tu; no puedo verificar que el registro sea tuyo. Usa ® solo si esta registrada. | `LICENSE.txt`/`CMakeLists.txt`: cambiar por ™ si no lo esta. |
+| – | "Diamont Vault®" | Es tu marca personal (confirmado por ti). Se mantiene en `LICENSE.txt`, `CMakeLists.txt` y el codigo. El simbolo ® solo es valido si esta registrada en tu jurisdiccion. | Sin cambio. |
 | – | 0 VU = −18 dBFS arbitrario | **Cierto.** Es convencion de mezcla (EBU −18, SMPTE −20), no un nivel de flujo de cinta. | Pendiente: parametro de nivel de referencia. |
 
 ## Metodo de cada medida (`tools/test_engine.cpp`, 48 kHz)

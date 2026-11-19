@@ -60,3 +60,8 @@ misma latencia con el plugin apagado o en bypass, asi que no hay saltos de fase 
 
 `cmake --build build --target test_engine` (o ver `tools/test_engine.cpp`): latencia, respuesta en frecuencia, THD,
 alias, ruido y wow/flutter. Resultados de referencia y limites en `docs/CALIBRACION.md`.
+
+## Si GitHub Actions no compila
+1. Pestana **Actions** del repositorio: si aparece un aviso, pulsa "I understand my workflows, go ahead and enable them".
+2. Elige "Build VST3 (Windows)" > **Run workflow** (el flujo permite ejecucion manual).
+3. Abre la ejecucion fallida y copia el texto del error del paso rojo; con eso se corrige el codigo.
