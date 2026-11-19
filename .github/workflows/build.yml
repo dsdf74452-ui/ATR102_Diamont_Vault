@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, Win32]
-    runs-on: windows-latest
+    runs-on: windows-2022
     # Win32 (32 bits) es experimental: si JUCE/VST3 no compila para esa arquitectura no bloquea el resto.
     continue-on-error: ${{ matrix.arch == 'Win32' }}
     steps:
