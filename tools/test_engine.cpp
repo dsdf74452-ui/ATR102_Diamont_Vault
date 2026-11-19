@@ -8,6 +8,8 @@
 
 using namespace atr;
 static const double PI = 3.14159265358979323846;
+static int fails = 0;
+static void check (bool ok, const char* what) { printf ("  [%s] %s\n", ok ? "OK" : "FALLO", what); if (! ok) ++fails; }
 
 static std::vector<float> run (Settings s, const std::vector<float>& in, double sr)
 {
@@ -54,6 +56,7 @@ int main()
         auto y = run (clean(), imp, sr);
         size_t pk = 0; for (size_t i = 0; i < y.size(); ++i) if (std::fabs (y[i]) > std::fabs (y[pk])) pk = i;
         printf ("Impulso: pico en %zu (esperado %d)\n", pk, 100 + TapeEngine::latencySamples());
+        check (pk == size_t (100 + TapeEngine::latencySamples()), "latencia medida == latencia reportada");
     }
 
     // 1. Respuesta en frecuencia (-40 dBFS, lineal)
@@ -69,10 +72,17 @@ int main()
         for (double f : fs) { auto y = run (s, sine (f, -40, sr, N), sr); out.push_back (mag (y, f, sr, skip, 24000)); if (f == 1000) ref = out.back(); }
         for (size_t i = 0; i < out.size(); ++i) printf ("%g:%+.2f ", fs[i], 20 * std::log10 (out[i] / ref));
         printf ("\n");
+        if (! bump)
+        {
+            double worst = 0; for (size_t i = 0; i < out.size(); ++i) if (fs[i] <= 10000) worst = std::max (worst, std::fabs (20 * std::log10 (out[i] / ref)));
+            check (worst < 0.5, "respuesta plana +-0.5 dB (30 Hz..10 kHz, bump off)");
+        }
+        else check (20 * std::log10 (out[2] / ref) > 1.0, "head bump: >1 dB a 60 Hz");
     }
     printf ("\nGanancia pequena senal a 1 kHz (-40 dBFS): ");
     { auto y = run (clean(), sine (1000, -40, sr, 96000), sr);
-      printf ("%+.3f dB\n", 20 * std::log10 (mag (y, 1000, sr, 24000, 24000) / std::pow (10.0, -2.0))); }
+      const double gdb = 20 * std::log10 (mag (y, 1000, sr, 24000, 24000) / std::pow (10.0, -2.0));
+      printf ("%+.3f dB\n", gdb); check (std::fabs (gdb) < 0.1, "ganancia pequena senal 1 kHz = 0 dB +-0.1"); }
 
     // 2. THD vs nivel
     printf ("\nTHD 1 kHz (H2+H3+H4+H5) vs nivel de entrada, 15 ips:\n");
@@ -80,13 +90,16 @@ int main()
     for (int tp = 0; tp < 3; ++tp)
     {
         printf (" cinta %s: ", names[tp]);
+        double lastThd = 0;
         for (double lvl : { -18.0, -12.0, -6.0, -3.0, 0.0 })
         {
             auto s = clean(); s.tape = tp; s.cal = 2;     // +6 dB cal
             auto y = run (s, sine (1000, lvl, sr, 96000), sr);
             const double f1 = mag (y, 1000, sr, 24000, 48000);
             double h = 0; for (int k = 2; k <= 5; ++k) { const double m = mag (y, 1000.0 * k, sr, 24000, 48000); h += m * m; }
-            printf ("%+.0fdBFS:%.2f%%  ", lvl, 100.0 * std::sqrt (h) / f1);
+            const double thd = 100.0 * std::sqrt (h) / f1;
+            printf ("%+.0fdBFS:%.2f%%  ", lvl, thd);
+            if (tp == 0) { check (thd >= lastThd, "THD crece con el nivel (456)"); lastThd = thd; }
         }
         printf ("\n");
     }
@@ -136,6 +149,8 @@ int main()
         }
         printf ("\nWow/flutter 100%%: desviacion pico de pitch = %.3f%% (3 kHz -> +-%.2f Hz)\n",
                 100.0 * fmaxDev / 3000.0, fmaxDev);
+        check (100.0 * fmaxDev / 3000.0 > 0.05 && 100.0 * fmaxDev / 3000.0 < 0.10, "wow/flutter pico 0.05..0.10 % (sin ponderar, tono 3 kHz, demod I/Q 10 ms)");
     }
-    return 0;
+    printf ("\n%d fallo(s)\n", fails);
+    return fails ? 1 : 0;
 }

@@ -432,11 +432,14 @@ void AtrEditor::timerCallback()
     speedNow += (target - speedNow) * (1.f - std::exp (-dt / tau));
     if (std::abs (speedNow) < 0.0005f && target == 0.f) speedNow = 0.f;
 
-    // geometria de los bobinados: la cinta pasa de la bobina izquierda a la derecha
+    // geometria de los bobinados: la cinta pasa de la bobina izquierda a la derecha.
+    // El avance es una onda triangular continua (sin saltos): al llegar al final de la "cinta"
+    // visual el bobinado se invierte suavemente en vez de saltar o de parar la transporte
+    // (parar enviaria el audio sin procesar en medio de una mezcla).
     const float ipsRatio = atr::kIps[juce::jlimit (0, 2, choice (ID::speed))] / 15.f;
-    tapeFrac += speedNow * ipsRatio * dt * 0.0015f;
-    if (tapeFrac > 0.92f) tapeFrac = 0.08f;
-    if (tapeFrac < 0.08f) tapeFrac = 0.92f;
+    tapePhase += speedNow * ipsRatio * dt * 0.0008f;
+    tapePhase -= std::floor (tapePhase);
+    tapeFrac = 0.08f + 0.84f * (1.f - std::abs (2.f * tapePhase - 1.f));
     auto packRadius = [] (float fill) { return std::sqrt (0.12f + fill * (1.f - 0.12f)); };  // 0..1 relativo
     const float rSupply = packRadius (1.f - tapeFrac), rTake = packRadius (tapeFrac);
     const float k = 2.4f * ipsRatio * speedNow;               // rad/s con la bobina a radio medio

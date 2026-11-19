@@ -72,7 +72,7 @@ private:
     bool syncing = false;
 
     // animacion
-    float speedNow = 0.f, tapeFrac = 0.5f, angL = 0.f, angR = 0.f;
+    float speedNow = 0.f, tapeFrac = 0.5f, tapePhase = 0.25f, angL = 0.f, angR = 0.f;
     double tapeTime = 0.0;
     double lastMs = 0.0;
     float needleDeg[2] { Layout::vuRestDeg, Layout::vuRestDeg };
